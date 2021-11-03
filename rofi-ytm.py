@@ -6,7 +6,7 @@
 # This rofi-blocks script searches youtube and opens the audio in mpv
 # Also prints the ascii representation of the thumbnail
 # ---------------------------------------------------------------------------
-# Dependencies:  wget, ascii-image-converter, rofi-blocks, pycurl
+# Dependencies:  wget, ascii-image-converter, rofi-blocks, mpv, pycurl
 # ---------------------------------------------------------------------------
 
 
@@ -116,3 +116,5 @@ while True:
                     mpv --no-video '{videos[selected]['url']}'\
                 \"&", shell=True)
             quit()
+
+# TODO add autoplay after song ends
