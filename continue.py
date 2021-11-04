@@ -1,5 +1,11 @@
 #! /usr/bin/env python
 
+# ------------------------------------------------------------------
+# This program takes a youtube video id as argument and allows
+# the user to either pick one of 5 recommendations or play the top
+# recommendation automatically.
+# ------------------------------------------------------------------
+
 from subprocess import Popen, PIPE, run
 from requests import get
 import config
