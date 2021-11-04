@@ -91,10 +91,10 @@ while True:
             print({'prompt': 'searching', 'lines': []})
             videos = get_videos(event['value'])
             videos_strings = [
-                f"{i+1}.    \
-                {v['title'][:config.TITLE_LENGTH].ljust(config.TITLE_LENGTH)}    \
-                {v['channel'][:config.CHANNEL_LENGTH].ljust(config.CHANNEL_LENGTH)}    \
-                {v['duration'].ljust(config.DURATION_LENGTH)}"
+                f"{i+1}.    "
+                f"{v['title'][:config.TITLE_LENGTH].ljust(config.TITLE_LENGTH)}    "
+                f"{v['channel'][:config.CHANNEL_LENGTH].ljust(config.CHANNEL_LENGTH)}    "
+                f"{v['duration'].ljust(config.DURATION_LENGTH)}"
                 for i, v in enumerate(videos)
             ]
             print({'prompt': 'pick video', 'lines': videos_strings, 'active entry': 0})
@@ -106,13 +106,13 @@ while True:
             print({'prompt': 'fetching', 'lines': []})
             run(['wget', video['thumbnail'], '-O', '/tmp/ytm_thumbnail'])
             run(
-                f"{config.TERMINAL} -e bash -c \"\
-                    echo '{video['title']}\n{video['url']}\n' && \
-                    ascii-image-converter /tmp/ytm_thumbnail --color -H 20 && \
-                    echo '\n' && \
-                    mpv --no-video '{videos[selected]['url']}' && \
-                    cd {dirname(__file__)} &&  \
-                    ./continue.py {video['id']}\
-                \" &", shell=True
+                f"{config.TERMINAL} -e bash -c \""
+                f"echo '{video['title']}\n{video['url']}\n' && "
+                "ascii-image-converter /tmp/ytm_thumbnail --color -H 20 && "
+                "echo '\n' &&"
+                f"mpv --no-video '{videos[selected]['url']}' && "
+                f"cd {dirname(__file__)} && "
+                f"./continue.py {video['id']}"
+                "\" &", shell=True
             )
             quit()
