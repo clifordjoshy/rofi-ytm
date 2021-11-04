@@ -16,31 +16,15 @@ print({'input action': 'send', 'prompt': 'search youtube'})
 from json import loads as jsonify
 from pycurl import Curl
 from io import BytesIO
-from os import getlogin as getusername
 from requests import get
 from re import findall
 from subprocess import run
 from urllib.parse import quote_plus as urlencode
+from os.path import dirname
+import config
 
-RESULT_COUNT = 5
-
-# length of different elements in video list
-TITLE_LENGTH = 40
-DURATION_LENGTH = 6
-CHANNEL_LENGTH = 15
-
-TERMINAL = 'alacritty'
-
-API_KEY_PATH = f"/home/{getusername()}/.config/apikeys/youtube"
-
-try:
-    with open(API_KEY_PATH) as key:
-        API_KEY = key.readline().strip()
-except:
-    API_KEY = None
-
-if not API_KEY:
-    print(f'{{"message": "No api keys found in \'{API_KEY_PATH}\'", "prompt": "error"}}')
+if not config.API_KEY:
+    print(f'{{"message": "No api keys found in \'{config.API_KEY_PATH}\'", "prompt": "error"}}')
     input()
     quit()
 
@@ -49,9 +33,9 @@ def get_videos(song_query):
     videos_json = get('https://www.googleapis.com/youtube/v3/search', params={
         'part': 'snippet',
         'q': song_query,
-        'maxResults': RESULT_COUNT,
+        'maxResults': config.RESULT_COUNT,
         'type': 'video',
-        'key': API_KEY
+        'key': config.API_KEY
     }, timeout=1).json()['items']
 
     vid_ids = ",".join(v['id']['videoId'] for v in videos_json)
@@ -59,16 +43,17 @@ def get_videos(song_query):
     details_json = get('https://www.googleapis.com/youtube/v3/videos', params={
         'part': 'contentDetails',
         'id': vid_ids,
-        'key': API_KEY
+        'key': config.API_KEY
     }, timeout=1).json()['items']
 
     videos = [{
+        'id': v['id']['videoId'],
         'title': v['snippet']['title'].replace('&#39;', "'").replace('&quot;', '"').replace('&amp;', '&'),
         'channel': v['snippet']['channelTitle'],
         'duration': d['contentDetails']['duration'][2:],
         'url': f"https://www.youtube.com/watch?v={v['id']['videoId']}",
         'thumbnail': v['snippet']['thumbnails']['medium']['url']
-    } for v, d in zip(videos_json, details_json)]
+    } for v, d in zip(videos_json, details_json) if "snippet" in v]
 
     return videos
 
@@ -87,7 +72,7 @@ def search_query(query):
         suggestions = findall(r"\[\"(.*?)\"", b_obj.getvalue().decode('utf8'))
     except:
         suggestions = [query]
-    return suggestions[:RESULT_COUNT]
+    return suggestions[:config.RESULT_COUNT]
 
 
 stage = 0
@@ -107,9 +92,9 @@ while True:
             videos = get_videos(event['value'])
             videos_strings = [
                 f"{i+1}.    \
-                {v['title'][:TITLE_LENGTH].ljust(TITLE_LENGTH)}    \
-                {v['channel'][:CHANNEL_LENGTH].ljust(CHANNEL_LENGTH)}    \
-                {v['duration'].ljust(DURATION_LENGTH)}"
+                {v['title'][:config.TITLE_LENGTH].ljust(config.TITLE_LENGTH)}    \
+                {v['channel'][:config.CHANNEL_LENGTH].ljust(config.CHANNEL_LENGTH)}    \
+                {v['duration'].ljust(config.DURATION_LENGTH)}"
                 for i, v in enumerate(videos)
             ]
             print({'prompt': 'pick video', 'lines': videos_strings, 'active entry': 0})
@@ -120,12 +105,14 @@ while True:
             video = videos[selected]
             print({'prompt': 'fetching', 'lines': []})
             run(['wget', video['thumbnail'], '-O', '/tmp/ytm_thumbnail'])
-            run(f"{TERMINAL} -e bash -c \"\
+            run(
+                f"{config.TERMINAL} -e bash -c \"\
                     echo '{video['title']}\n{video['url']}\n' && \
                     ascii-image-converter /tmp/ytm_thumbnail --color -H 20 && \
                     echo '\n' && \
-                    mpv --no-video '{videos[selected]['url']}'\
-                \"&", shell=True)
+                    mpv --no-video '{videos[selected]['url']}' && \
+                    cd {dirname(__file__)} &&  \
+                    ./continue.py {video['id']}\
+                \" &", shell=True
+            )
             quit()
-
-# TODO add autoplay after song ends
