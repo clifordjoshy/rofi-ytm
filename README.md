@@ -19,3 +19,11 @@ rofi -modi blocks -show blocks -blocks-wrap <path/to/script>
 - [ascii-image-converter](https://github.com/TheZoraiz/ascii-image-converter)
 - [mpv](https://github.com/mpv-player/mpv)
 - [pycurl](https://github.com/pycurl/pycurl)
+
+<br>
+
+### Functionality
+
+- Allows to search for the required video on youtube
+- Prints the video thumbnail to the terminal
+- Ability to autoplay/pick next song from the related videos
