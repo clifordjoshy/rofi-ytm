@@ -16,7 +16,7 @@ print({'input action': 'send', 'prompt': 'search youtube'})
 from json import loads as jsonify
 from pycurl import Curl
 from io import BytesIO
-import os, sys
+from os import getlogin as getusername
 from requests import get
 from re import findall
 from subprocess import run
@@ -31,18 +31,19 @@ CHANNEL_LENGTH = 15
 
 TERMINAL = 'alacritty'
 
-api_keys_path = f"/home/{os.getlogin()}/.config/apikeys/youtube"
+API_KEY_PATH = f"/home/{getusername()}/.config/apikeys/youtube"
 
-if not os.path.exists(api_keys_path):
-    print(f"Please provide the youtube api keys in '{api_keys_path}'", file = sys.stderr)
-    exit(1)
+try:
+    with open(API_KEY_PATH) as key:
+        API_KEY = key.readline().strip()
+except:
+    API_KEY = None
 
-with open(api_keys_path) as key:
-    API_KEY = key.read().strip()
+if not API_KEY:
+    print(f'{{"message": "No api keys found in \'{API_KEY_PATH}\'", "prompt": "error"}}')
+    input()
+    quit()
 
-if API_KEY == "":
-    print(f"No api keys found in '{api_keys_path}'", file = sys.stderr)
-    exit(1)
 
 def get_videos(song_query):
     videos_json = get('https://www.googleapis.com/youtube/v3/search', params={
