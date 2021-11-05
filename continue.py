@@ -42,7 +42,7 @@ videos_json = get('https://www.googleapis.com/youtube/v3/search', params={
 
 videos = [{
     'id': v['id']['videoId'],
-    'title': v['snippet']['title'].replace('&#39;', "'").replace('&quot;', '"').replace('&amp;', '&').replace('"', '').replace("'", ''),
+    'title': v['snippet']['title'].replace('&#39;', "").replace('&quot;', '').replace('&amp;', '&'),
     'channel': v['snippet']['channelTitle'],
     'url': f"https://www.youtube.com/watch?v={v['id']['videoId']}",
     'thumbnail': v['snippet']['thumbnails']['medium']['url']

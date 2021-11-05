@@ -48,7 +48,7 @@ def get_videos(song_query):
 
     videos = [{
         'id': v['id']['videoId'],
-        'title': v['snippet']['title'].replace('&#39;', "'").replace('&quot;', '"').replace('&amp;', '&'),
+        'title': v['snippet']['title'].replace('&amp;', '&').replace('&#39;', '').replace('&quot;', ''),
         'channel': v['snippet']['channelTitle'],
         'duration': d['contentDetails']['duration'][2:],
         'url': f"https://www.youtube.com/watch?v={v['id']['videoId']}",
@@ -69,7 +69,7 @@ def search_query(query):
     crl.setopt(crl.WRITEDATA, b_obj)
     try:
         crl.perform()
-        suggestions = findall(r"\[\"(.*?)\"", b_obj.getvalue().decode('utf8'))
+        suggestions = findall(r"\[\"(.*?)\"", b_obj.getvalue().decode('unicode_escape'))
     except:
         suggestions = [query]
     return suggestions[:config.RESULT_COUNT]
@@ -109,7 +109,7 @@ while True:
                 f"{config.TERMINAL} -e bash -c \""
                 f"echo '{video['title']}\n{video['url']}\n' && "
                 "ascii-image-converter /tmp/ytm_thumbnail --color -H 20 && "
-                "echo '\n' &&"
+                "echo '\n' && "
                 f"mpv --no-video '{videos[selected]['url']}' && "
                 f"cd {dirname(__file__)} && "
                 f"./continue.py {video['id']}"
