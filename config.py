@@ -8,7 +8,8 @@ TITLE_LENGTH = 40
 DURATION_LENGTH = 6
 CHANNEL_LENGTH = 15
 
-TERMINAL = 'alacritty'
+# --class argument is specified so that the WM can apply my rules to map it to the music tag
+TERMINAL = 'alacritty --class mpv-ytm'
 
 API_KEY_PATH = f"/home/{getusername()}/.config/apikeys/youtube"
 
