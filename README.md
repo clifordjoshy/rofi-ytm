@@ -18,6 +18,7 @@ rofi -modi blocks -show blocks -blocks-wrap <path/to/script>
 - [rofi-blocks](https://github.com/OmarCastro/rofi-blocks)
 - [ascii-image-converter](https://github.com/TheZoraiz/ascii-image-converter)
 - [mpv](https://github.com/mpv-player/mpv)
+- [youtube-dl](https://github.com/ytdl-org/youtube-dl)
 - [pycurl](https://github.com/pycurl/pycurl)
 
 <br>
