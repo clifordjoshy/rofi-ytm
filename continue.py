@@ -11,15 +11,16 @@ from requests import get
 import config
 import sys
 
-from requests.api import options
+VIDEO_ID = sys.argv[1]
 
 autoplay_options = [
     "yes, play immediately",
     "yes, but I'll pick",
+    "no, repeat the current song",
     "no, quit"
 ]
 
-process = Popen(['rofi', '-dmenu', '-p', 'play next', '-l', '3'], stdout=PIPE, stdin=PIPE)
+process = Popen(['rofi', '-dmenu', '-p', 'play next', '-l', str(len(autoplay_options))], stdout=PIPE, stdin=PIPE)
 process.stdin.write('\n'.join(autoplay_options).encode("utf8"))
 selected = process.communicate()[0].decode("utf8")
 
@@ -27,15 +28,24 @@ if autoplay_options[0] in selected:
     autoplay = True
 elif autoplay_options[1] in selected:
     autoplay = False
+elif autoplay_options[2] in selected:
+    run(
+        f"nohup {config.TERMINAL} -e bash -c \"\
+        ascii-image-converter /tmp/ytm_thumbnail --color -H 20 && \
+        echo '\n' && \
+        mpv --no-video 'https://www.youtube.com/watch?v={VIDEO_ID}' &&\
+        ./continue.py {VIDEO_ID} ||\
+        read -n1 -p 'Error. Press any key to quit.'\
+    \" &", shell=True
+    )
+    quit()
 else:
     quit()
-
-VIDEO_ID = sys.argv[1]
 
 videos_json = get('https://www.googleapis.com/youtube/v3/search', params={
     'part': 'snippet',
     'relatedToVideoId': VIDEO_ID,
-    'maxResults': 1 if autoplay else config.RESULT_COUNT,
+    'maxResults': config.RESULT_COUNT,
     'type': 'video',
     'key': config.API_KEY
 }, timeout=1).json()['items']
@@ -71,7 +81,8 @@ run(
         ascii-image-converter /tmp/ytm_thumbnail --color -H 20 && \
         echo '\n' && \
         mpv --no-video '{video['url']}' &&\
-        ./continue.py {video['id']}\
+        ./continue.py {video['id']} ||\
+        read -n1 -p 'Error. Press any key to quit.'\
     \" &", shell=True
 )
 quit()

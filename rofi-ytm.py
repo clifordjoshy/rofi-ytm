@@ -112,7 +112,7 @@ while True:
                 "echo '\n' && "
                 f"mpv --no-video '{videos[selected]['url']}' && "
                 f"cd {dirname(__file__)} && "
-                f"./continue.py {video['id']}"
-                "\" &", shell=True
+                f"./continue.py {video['id']} || "
+                "read -n1 -p 'Error. Press any key to quit.'\" &", shell=True
             )
             quit()
