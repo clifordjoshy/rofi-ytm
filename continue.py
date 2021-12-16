@@ -46,6 +46,7 @@ videos_json = get('https://www.googleapis.com/youtube/v3/search', params={
     'part': 'snippet',
     'relatedToVideoId': VIDEO_ID,
     'maxResults': config.RESULT_COUNT,
+    'regionCode': config.REGION,
     'type': 'video',
     'key': config.API_KEY
 }, timeout=1).json()['items']

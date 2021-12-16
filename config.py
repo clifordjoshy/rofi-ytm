@@ -13,6 +13,9 @@ TERMINAL = 'alacritty --class mpv-ytm'
 
 API_KEY_PATH = f"/home/{getusername()}/.config/apikeys/youtube"
 
+# ISO 3166-1 alpha-2 country code to only allow videos available in the country
+REGION = "IN"
+
 try:
     with open(API_KEY_PATH) as key:
         API_KEY = key.readline().strip()

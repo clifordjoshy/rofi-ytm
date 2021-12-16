@@ -34,6 +34,7 @@ def get_videos(song_query):
         'part': 'snippet',
         'q': song_query,
         'maxResults': config.RESULT_COUNT,
+        'regionCode': config.REGION,
         'type': 'video',
         'key': config.API_KEY
     }, timeout=1).json()['items']
@@ -88,7 +89,7 @@ while True:
         # query entered
         if stage == 0:
             stage = 1
-            print({'prompt': 'searching', 'lines': []})
+            print({'prompt': 'searching', 'lines': [], 'value': ""})
             videos = get_videos(event['value'])
             videos_strings = [
                 f"{i+1}.    "
