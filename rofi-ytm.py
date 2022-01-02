@@ -13,6 +13,15 @@
 # imports take time. so do this first to immediately see prompt.
 print({'input action': 'send', 'prompt': 'search youtube'})
 
+from os.path import dirname
+try:
+    with open(f"{dirname(__file__)}/.search_history") as hist_file:
+        hist_vals = hist_file.read().splitlines()
+except FileNotFoundError:
+    hist_vals = []
+
+print({'lines': hist_vals, 'prompt': 'search youtube', 'input action': 'send'})
+
 from json import loads as jsonify
 from pycurl import Curl
 from io import BytesIO
@@ -20,7 +29,6 @@ from requests import get
 from re import findall
 from subprocess import run
 from urllib.parse import quote_plus as urlencode
-from os.path import dirname
 import config
 
 if not config.API_KEY:
@@ -76,6 +84,20 @@ def search_query(query):
     return suggestions[:config.RESULT_COUNT]
 
 
+def update_history(query):
+    if query in hist_vals:
+        hist_vals.remove(query)
+
+    if len(hist_vals) >= 5:
+        hist_vals.pop()
+
+    hist_vals.insert(0, query)
+
+    with open(f"{dirname(__file__)}/.search_history", "w") as hist_file:
+        for val in hist_vals:
+            hist_file.write(val + "\n")
+
+
 stage = 0
 
 while True:
@@ -90,6 +112,7 @@ while True:
         if stage == 0:
             stage = 1
             print({'prompt': 'searching', 'lines': [], 'value': ""})
+            update_history(event['value'])
             videos = get_videos(event['value'])
             videos_strings = [
                 f"{i+1}.    "
